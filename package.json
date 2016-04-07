@@ -1,0 +1,39 @@
+{
+  "name": "lambda-logger",
+  "version": "0.0.1",
+  "description": "AWS Lambda logging tool",
+  "main": "lambda-logger",
+  "license": "MIT",
+  "author": "Patrick Mueller <pmuellr@apache.org> (https://github.com/pmuellr)",
+  "keywords": [
+    "AWS",
+    "CloudWatch",
+    "Lambda",
+    "log"
+  ],
+  "bin": {
+    "lambda-logger": "lambda-logger.js"
+  },
+  "scripts": {
+    "standard": "standard",
+    "watch": "nodemon --exec 'npm run standard' --ext js,json"
+  },
+  "devDependencies": {
+    "nodemon": "~1.9.1",
+    "standard": "~6.0.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pmuellr/lambda-logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pmuellr/lambda-logger/issues"
+  },
+  "homepage": "https://github.com/pmuellr/lambda-logger",
+  "dependencies": {
+    "async": "~2.0.0-rc.2",
+    "bl": "~1.1.2",
+    "moment": "~2.12.0",
+    "yargs": "~4.4.0"
+  }
+}
