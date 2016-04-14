@@ -20,12 +20,15 @@ function main () {
   const argv = yargs
     .alias('l', 'list')
     .alias('u', 'update')
+    .alias('p', 'print')
     .alias('a', 'all')
+    .alias('s', 'since')
     .alias('g', 'grouped')
     .alias('d', 'debug')
     .alias('h', 'help')
     .boolean('list')
     .boolean('update')
+    .boolean('print')
     .boolean('all')
     .boolean('grouped')
     .boolean('debug')
@@ -38,6 +41,14 @@ function main () {
 
   util.debugLog('parsed args: %s', JSON.stringify(argv, null, 2))
 
+  if (argv.all) argv.since = '1970-01-01'
+
+  let since
+  if (argv.since) {
+    since = normalizeSince(argv.since)
+    util.debugLog('since value: %s', new Date(since).toISOString())
+  }
+
   const lambda = argv._[0]
 
   if (lambda == null) {
@@ -46,14 +57,15 @@ function main () {
   }
 
   var opts = {
-    all: argv.all,
+    since: since,
     grouped: argv.grouped
   }
 
   if (argv.list) return listStreams(lambda)
   if (argv.update) return updateStreams(lambda, opts)
+  if (argv.print) return printEvents(lambda, opts)
 
-  return printEvents(lambda, opts)
+  updateAndPrint(lambda, opts)
 }
 
 // list log groups of lambdas
@@ -92,6 +104,47 @@ function printEvents (lambda, opts) {
   })
 }
 
+function updateAndPrint (lambda, opts) {
+  cmdUpdateStreams.run(lambda, opts, function (err) {
+    if (err) return logError(err)
+
+    cmdPrintEvents.run(lambda, opts, function (err) {
+      if (err) return logError(err)
+    })
+  })
+}
+
+// normalize a since option
+function normalizeSince (since) {
+  since = '' + since
+
+  const origSince = since
+
+  since = since.replace(/\//g, '-')
+  const pieces = since.split('-')
+
+  const currDate = new Date().toISOString()
+  const currYY = currDate.substr(0, 4)
+  const currMM = currDate.substr(5, 2)
+
+  if (pieces.length === 1) {
+    since = `${currYY}/${currMM}/${pieces[0]}`
+  } else if (pieces.length === 2) {
+    since = `${currYY}/${pieces[0]}/${pieces[1]}`
+  } else {
+    since = `${pieces[0]}/${pieces[1]}/${pieces[2]}`
+  }
+
+  since = Date.parse(since)
+  if (isNaN(since)) {
+    logError(`invalid since value ${origSince}`)
+    process.exit(1)
+  }
+
+  return since
+}
+
+// print an error message
 function logError (err) {
   util.log('error:', err)
 }

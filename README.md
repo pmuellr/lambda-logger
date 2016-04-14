@@ -20,25 +20,31 @@ Since I tend to do a fair bit of analysis on these, I wanted to be able to
 access the logs quickly, therefore the whole "download" bit, before-hand.  Plus,
 I'm a cheap-ass - it costs money to download those things live all the time!
 
-The basic story is to download the logs with:
-
-    lambda-logger --update my-flavorite-lambda
-
-and then you can have them printed to stdout with:
-
-    lambda-logger my-flavorite-lambda
-
 options:
 
-    -l --list     list lambdas / streams with logs in CloudWatch
-    -u --update   update the local logs from CloudWatch
-    -a --all      show all entries, not just today's
-    -g --grouped  group entries by transaction when printing
-    -d --debug    generate debug information
-    -h --help     print this help
+    -h --help        print this help
+    -l --list        list lambdas / streams with logs in CloudWatch
+    -p --print       show log entries
+    -u --update      update the local logs from CloudWatch
+    -a --all         show/update entries since the beginning of time
+    -s --since date  show/update entries since specified date
+    -g --grouped     group entries by transaction when printing
+    -d --debug       generate debug information
 
-If you don't specify help, list, or update, lamda-logger will print log
-entries for the specified lambda from today.
+If you don't specify help, list, print or update, lamda-logger will update
+and then print entries for the last 24 hours.
+
+The date value for the `since` option should be in the form:
+
+* n     - uses current year and month and specified day
+* n-n   - uses current year and specified month and day
+* n-n-n - uses specified year, month and day
+
+Example, if today is 2014-07-13, given a `since` value of
+
+* '5'        - uses date 2014-07-05
+* '5-6'      - uses date 2014-05-06
+* '2015-6-7' - uses date 2015-06-07
 
 Typical usage would be as follows:
 
@@ -50,26 +56,30 @@ To see the streams available (for curiousity, mainly) use:
 
     lambda-logger -l my-flavorite-lambda
 
+To download and print log entries for the last 24 hours, use:
+
+    lambda-logger my-flavorite-lambda
+
 To download log streams so that you can print the log entries later, use:
 
     lambda-logger -u my-flavorite-lambda
 
-This will only download log streams with today's date.  To download all
-the log streams, use the `-a` option:
+This will only download log streams updated in the last 24 hourse.  To download
+all the log streams, use the `-a` option:
 
     lambda-logger -ua my-flavorite-lambda
 
 After you've download the log streams, you can refresh them from CloudWatch
 with the same commands, as they may have newer entries.
 
-To view the log entries, just don't use the `-u` or `-l` option:
+To view the log entries without downloading updates, use the `-p` option:
 
-    lambda-logger my-flavorite-lambda
+    lambda-logger -p my-flavorite-lambda
 
-This just shows log entries from streams created today. You can use the `-a`
-option here as well to view all the log entries you have.  You can also use the
-`-g` option to group messages by the transaction they were run in, instead of
-sorted by date.
+This just shows log entries since the last 24 hours.
+
+You can also use the `-g` option to group messages by the transaction they were
+run in, instead of sorting all messages by date.
 
 
 install
