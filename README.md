@@ -6,9 +6,9 @@ Utility for AWS Lambda logs in Amazon CloudWatch.
 usage
 ================================================================================
 
-    lambda-logger [options] <lambda>
+    lambda-logger [options] <lambda> <lambda> ...
 
-`<lambda>` is the name of your AWS Lambda function.
+`<lambda>` is the name of an AWS Lambda function.
 
 The design of `lambda-logger` is to download your logs locally (into your
 `~/.lambda-logger` directory), and then you can print the log entries after
@@ -54,27 +54,27 @@ This command will list lambdas that have logs at CloudWatch.
 
 To see the streams available (for curiousity, mainly) use:
 
-    lambda-logger -l my-flavorite-lambda
+    lambda-logger -l my-flavorite-lambda another-lambda ...
 
 To download and print log entries for the last 24 hours, use:
 
-    lambda-logger my-flavorite-lambda
+    lambda-logger my-flavorite-lambda another-lambda ...
 
 To download log streams so that you can print the log entries later, use:
 
-    lambda-logger -u my-flavorite-lambda
+    lambda-logger -u my-flavorite-lambda another-lambda ...
 
 This will only download log streams updated in the last 24 hourse.  To download
 all the log streams, use the `-a` option:
 
-    lambda-logger -ua my-flavorite-lambda
+    lambda-logger -ua my-flavorite-lambda another-lambda ...
 
 After you've download the log streams, you can refresh them from CloudWatch
 with the same commands, as they may have newer entries.
 
 To view the log entries without downloading updates, use the `-p` option:
 
-    lambda-logger -p my-flavorite-lambda
+    lambda-logger -p my-flavorite-lambda another-lambda ...
 
 This just shows log entries since the last 24 hours.
 

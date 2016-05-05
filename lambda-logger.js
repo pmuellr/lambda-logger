@@ -49,9 +49,9 @@ function main () {
     util.debugLog('since value: %s', new Date(since).toISOString())
   }
 
-  const lambda = argv._[0]
+  const lambdas = argv._
 
-  if (lambda == null) {
+  if (lambdas[0] == null) {
     if (argv.list) return listLambdas()
     return util.help()
   }
@@ -61,11 +61,11 @@ function main () {
     grouped: argv.grouped
   }
 
-  if (argv.list) return listStreams(lambda)
-  if (argv.update) return updateStreams(lambda, opts)
-  if (argv.print) return printEvents(lambda, opts)
+  if (argv.list) return listStreams(lambdas)
+  if (argv.update) return updateStreams(lambdas, opts)
+  if (argv.print) return printEvents(lambdas, opts)
 
-  updateAndPrint(lambda, opts)
+  updateAndPrint(lambdas, opts)
 }
 
 // list log groups of lambdas
@@ -80,36 +80,48 @@ function listLambdas () {
 }
 
 // list log streams of a lambda
-function listStreams (lambda) {
-  cmdListStreams.run(lambda, function (err, streams) {
-    if (err) return logError(err)
+function listStreams (lambdas) {
+  lambdas.forEach(function (lambda) {
+    cmdListStreams.run(lambda, function (err, streams) {
+      if (err) return logError(err)
 
-    for (let stream of streams) {
-      console.log(stream)
-    }
+      if (lambdas.length >= 1) console.log(lambda + ':')
+
+      for (let stream of streams) {
+        console.log(stream)
+      }
+
+      if (lambdas.length >= 1) console.log('')
+    })
   })
 }
 
 // list log streams of a lambda
-function updateStreams (lambda, opts) {
-  cmdUpdateStreams.run(lambda, opts, function (err) {
-    if (err) return logError(err)
+function updateStreams (lambdas, opts) {
+  lambdas.forEach(function (lambda) {
+    cmdUpdateStreams.run(lambda, opts, function (err) {
+      if (err) return logError(err)
+    })
   })
 }
 
 // print events
-function printEvents (lambda, opts) {
-  cmdPrintEvents.run(lambda, opts, function (err) {
-    if (err) return logError(err)
+function printEvents (lambdas, opts) {
+  lambdas.forEach(function (lambda) {
+    cmdPrintEvents.run(lambda, opts, function (err) {
+      if (err) return logError(err)
+    })
   })
 }
 
-function updateAndPrint (lambda, opts) {
-  cmdUpdateStreams.run(lambda, opts, function (err) {
-    if (err) return logError(err)
-
-    cmdPrintEvents.run(lambda, opts, function (err) {
+function updateAndPrint (lambdas, opts) {
+  lambdas.forEach(function (lambda) {
+    cmdUpdateStreams.run(lambda, opts, function (err) {
       if (err) return logError(err)
+
+      cmdPrintEvents.run(lambda, opts, function (err) {
+        if (err) return logError(err)
+      })
     })
   })
 }
